@@ -19,24 +19,25 @@ export const TerminalView: React.FC = () => {
     }, [logs]);
 
     const groupedLogs = React.useMemo(() => {
-        if (logs.length === 0) return [];
+        const visibleLogs = logs.filter(log => !log.hiddenFromTerminal);
+        if (visibleLogs.length === 0) return [];
 
         const groups: { id: string; direction: 'TX' | 'RX'; data: Uint8Array[] }[] = [];
         let currentGroup = {
-            id: logs[0].id,
-            direction: logs[0].direction,
-            data: [logs[0].data]
+            id: visibleLogs[0].id,
+            direction: visibleLogs[0].direction,
+            data: [visibleLogs[0].data]
         };
 
-        for (let i = 1; i < logs.length; i++) {
-            if (logs[i].direction === currentGroup.direction) {
-                currentGroup.data.push(logs[i].data);
+        for (let i = 1; i < visibleLogs.length; i++) {
+            if (visibleLogs[i].direction === currentGroup.direction) {
+                currentGroup.data.push(visibleLogs[i].data);
             } else {
                 groups.push(currentGroup);
                 currentGroup = {
-                    id: logs[i].id,
-                    direction: logs[i].direction,
-                    data: [logs[i].data]
+                    id: visibleLogs[i].id,
+                    direction: visibleLogs[i].direction,
+                    data: [visibleLogs[i].data]
                 };
             }
         }

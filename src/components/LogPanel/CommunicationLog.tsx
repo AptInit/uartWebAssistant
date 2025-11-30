@@ -65,7 +65,13 @@ export const CommunicationLog: React.FC = () => {
                         const displayText = fullText.length > 500 ? fullText.slice(0, 500) + '...' : fullText;
 
                         return (
-                            <div className="flex gap-2 hover:bg-gray-800 p-1 rounded group items-start mb-1">
+                            <div
+                                className="flex gap-2 hover:bg-gray-800 p-1 rounded group items-start mb-1 cursor-pointer active:bg-gray-700 transition-colors"
+                                onClick={() => {
+                                    navigator.clipboard.writeText(fullText);
+                                }}
+                                title="Click to copy"
+                            >
                                 <span className="text-gray-500 shrink-0 select-none text-[10px] w-14 pt-0.5">
                                     {formatTimestamp(group.timestamp)}
                                 </span>

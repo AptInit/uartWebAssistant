@@ -66,7 +66,7 @@ export const XmodemModal: React.FC<XmodemModalProps> = ({ isOpen, onClose }) => 
             const MAX_RETRIES = 30;
             for (let i = 0; i < MAX_RETRIES; i++) {
                 if (responseReceived) break;
-                await sendData(new Uint8Array([CAN]));
+                await sendData(new Uint8Array([CAN]), true);
                 await new Promise(resolve => setTimeout(resolve, 100));
             }
 
@@ -138,7 +138,7 @@ export const XmodemModal: React.FC<XmodemModalProps> = ({ isOpen, onClose }) => 
 
                 while (!sent && retries < MAX_RETRIES) {
                     await sendWithRateLimit(
-                        async (chunk) => await sendData(chunk),
+                        async (chunk) => await sendData(chunk, true),
                         packet,
                         currentRateLimitConfig.enabled ? currentRateLimitConfig.chunkSize : 0,
                         currentRateLimitConfig.enabled ? currentRateLimitConfig.delayMs : 0
@@ -186,12 +186,12 @@ export const XmodemModal: React.FC<XmodemModalProps> = ({ isOpen, onClose }) => 
             }
 
             // End of Transmission
-            await sendData(new Uint8Array([EOT]));
+            await sendData(new Uint8Array([EOT]), true);
             try {
                 const eotResponse = await waitForByte(1000);
                 if (eotResponse !== ACK) {
                     // Try sending EOT again?
-                    await sendData(new Uint8Array([EOT]));
+                    await sendData(new Uint8Array([EOT]), true);
                 }
             } catch {
                 // Ignore EOT timeout
@@ -235,7 +235,7 @@ export const XmodemModal: React.FC<XmodemModalProps> = ({ isOpen, onClose }) => 
 
         try {
             // Send C to request CRC
-            await sendData(new Uint8Array([C_CHAR]));
+            await sendData(new Uint8Array([C_CHAR]), true);
 
             let firstBlockReceived = false;
 
@@ -270,11 +270,11 @@ export const XmodemModal: React.FC<XmodemModalProps> = ({ isOpen, onClose }) => 
                             // Error or duplicate
                             if (blockNum === ((expectedBlock - 1) & 0xFF)) {
                                 // Duplicate, ACK and ignore
-                                await sendData(new Uint8Array([ACK]));
+                                await sendData(new Uint8Array([ACK]), true);
                                 continue;
                             }
                             // Fatal error or out of sync
-                            await sendData(new Uint8Array([CAN]));
+                            await sendData(new Uint8Array([CAN]), true);
                             throw new Error(`Block number mismatch: expected ${expectedBlock}, got ${blockNum}`);
                         }
 
@@ -283,26 +283,26 @@ export const XmodemModal: React.FC<XmodemModalProps> = ({ isOpen, onClose }) => 
                             const calculatedCrc = calculateCRC16(blockData);
                             if (calculatedCrc !== receivedCrcOrChecksum) {
                                 console.warn(`CRC mismatch: expected ${calculatedCrc.toString(16)}, got ${receivedCrcOrChecksum.toString(16)}`);
-                                await sendData(new Uint8Array([NAK]));
+                                await sendData(new Uint8Array([NAK]), true);
                                 continue;
                             }
                         } else {
                             const calculatedChecksum = calculateChecksum(blockData);
                             if (calculatedChecksum !== receivedCrcOrChecksum) {
                                 console.warn(`Checksum mismatch: expected ${calculatedChecksum.toString(16)}, got ${receivedCrcOrChecksum.toString(16)}`);
-                                await sendData(new Uint8Array([NAK]));
+                                await sendData(new Uint8Array([NAK]), true);
                                 continue;
                             }
                         }
 
                         receivedData.push(blockData);
                         expectedBlock = (expectedBlock + 1) & 0xFF;
-                        await sendData(new Uint8Array([ACK]));
+                        await sendData(new Uint8Array([ACK]), true);
                         firstBlockReceived = true;
                         setStatus(`Received block ${blockNum}...`);
 
                     } else if (byte === EOT) {
-                        await sendData(new Uint8Array([ACK]));
+                        await sendData(new Uint8Array([ACK]), true);
                         break; // Transfer done
                     } else {
                         // Unexpected byte - ignore it to avoid flooding
@@ -313,7 +313,7 @@ export const XmodemModal: React.FC<XmodemModalProps> = ({ isOpen, onClose }) => 
                     if (!firstBlockReceived && retries < MAX_RETRIES) {
                         retries++;
                         console.log('Retrying handshake...');
-                        await sendData(new Uint8Array([useCRC ? C_CHAR : NAK]));
+                        await sendData(new Uint8Array([useCRC ? C_CHAR : NAK]), true);
                     } else {
                         throw e;
                     }
@@ -333,10 +333,6 @@ export const XmodemModal: React.FC<XmodemModalProps> = ({ isOpen, onClose }) => 
                 if (window.showSaveFilePicker) {
                     const handle = await window.showSaveFilePicker({
                         suggestedName: 'received_file.bin',
-                        types: [{
-                            description: 'Binary File',
-                            accept: { 'application/octet-stream': ['.bin'] },
-                        }],
                     });
                     const writable = await handle.createWritable();
                     await writable.write(finalBuffer);

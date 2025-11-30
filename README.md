@@ -5,11 +5,9 @@ A modern, web-based serial port terminal for embedded development, built with Re
 ## Features
 
 - **Web Serial API Integration**: Connect to serial devices directly from your browser.
-- **Real-time Communication**: Send and receive data in real-time.
 - **Multiple Modes**: Support for both ASCII/Text and Hexadecimal data visualization.
 - **XMODEM Support**: Upload and download files using the XMODEM protocol.
-- **Log Management**: View, filter, and export communication logs.
-- **Modern UI**: Clean and responsive interface with dark mode support.
+- **Copy to Clipboard**: Click on any log entry to copy its content.
 
 ## Getting Started
 
@@ -55,11 +53,14 @@ Open your browser and navigate to `http://localhost:5173`.
   - **Hex Mode**: Toggle between ASCII/Text and Hexadecimal display modes.
   - **Rate Limit**: Configure data sending rate limits (Delay and Chunk size) to prevent buffer overflows on slower devices.
 - **Input Area**: Type your message in the input field at the bottom and press Enter or click Send.
+- **Logs**: Click on any log entry (TX or RX) to copy its content to the clipboard.
 
 ### XMODEM File Transfer
 
 - **Upload**: Click the "Upload" button to send a file to the connected device using XMODEM.
+  - Supports **Rate Limiting** for uploads to slow devices.
 - **Download**: Click the "Download" button to receive a file from the device.
+  - Uses the browser's **File Save Picker** to save the received file.
 
 ## Building for Production
 

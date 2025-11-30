@@ -7,13 +7,14 @@ export interface LogEntry {
     timestamp: Date;
     direction: 'TX' | 'RX';
     data: Uint8Array;
+    hiddenFromTerminal?: boolean;
 }
 
 interface SerialContextType {
     isConnected: boolean;
     connect: (options: SerialOptions) => Promise<void>;
     disconnect: () => Promise<void>;
-    sendData: (data: string | Uint8Array) => Promise<void>;
+    sendData: (data: string | Uint8Array, hiddenFromTerminal?: boolean) => Promise<void>;
     logs: LogEntry[];
     clearLogs: () => void;
     setDataHandler: (handler: ((data: Uint8Array) => void) | null) => void;
@@ -49,13 +50,14 @@ export const SerialProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         dataHandlerRef.current = handler;
     }, []);
 
-    const addLog = useCallback((direction: 'TX' | 'RX', data: Uint8Array) => {
+    const addLog = useCallback((direction: 'TX' | 'RX', data: Uint8Array, hiddenFromTerminal?: boolean) => {
         setLogs(prev => {
             const newLog: LogEntry = {
                 id: crypto.randomUUID(),
                 timestamp: new Date(),
                 direction,
                 data,
+                hiddenFromTerminal,
             };
             const newLogs = [...prev, newLog];
             if (newLogs.length > 1000) {
@@ -65,11 +67,11 @@ export const SerialProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         });
     }, []);
 
-    const sendData = useCallback(async (data: string | Uint8Array) => {
+    const sendData = useCallback(async (data: string | Uint8Array, hiddenFromTerminal: boolean = false) => {
         try {
             await write(data);
             const dataArray = typeof data === 'string' ? new TextEncoder().encode(data) : data;
-            addLog('TX', dataArray);
+            addLog('TX', dataArray, hiddenFromTerminal);
         } catch (error) {
             console.error('Failed to send data:', error);
             throw error;
