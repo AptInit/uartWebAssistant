@@ -1,17 +1,13 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { ArrowDown, ArrowUp, Trash2, FileText, Binary } from 'lucide-react';
+import { Virtuoso, type VirtuosoHandle } from 'react-virtuoso';
 import { useSerialContext } from '../../context/SerialContext';
 import { toHex, toAscii, formatTimestamp } from '../../utils/formatters';
 
 export const CommunicationLog: React.FC = () => {
     const { logs, clearLogs } = useSerialContext();
     const [isHexMode, setIsHexMode] = useState(true);
-    const endRef = useRef<HTMLDivElement>(null);
-
-    // Auto-scroll to bottom
-    useEffect(() => {
-        endRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, [logs]);
+    const virtuosoRef = useRef<VirtuosoHandle>(null);
 
     const groupedLogs = React.useMemo(() => {
         if (logs.length === 0) return [];
@@ -64,49 +60,34 @@ export const CommunicationLog: React.FC = () => {
                 </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-2 space-y-1 font-mono text-xs">
-                {groupedLogs.map((group) => (
-                    <LogEntry key={group.id} group={group} isHexMode={isHexMode} />
-                ))}
-                <div ref={endRef} />
-            </div>
-        </div>
-    );
-};
+            <div className="flex-1 p-2">
+                <Virtuoso
+                    style={{ height: '100%' }}
+                    ref={virtuosoRef}
+                    data={groupedLogs}
+                    followOutput={'auto'}
+                    itemContent={(_, group) => {
+                        const fullText = group.data.map(chunk => isHexMode ? toHex(chunk) : toAscii(chunk)).join('');
+                        // Truncate for performance, but Virtuoso handles variable height so we could show more if we wanted.
+                        // Let's keep it somewhat limited for now but allow wrapping.
+                        const displayText = fullText.length > 500 ? fullText.slice(0, 500) + '...' : fullText;
 
-const LogEntry: React.FC<{
-    group: { id: string; timestamp: Date; direction: 'TX' | 'RX'; data: Uint8Array[] };
-    isHexMode: boolean;
-}> = ({ group, isHexMode }) => {
-    const [isExpanded, setIsExpanded] = useState(false);
-
-    const fullText = React.useMemo(() => {
-        return group.data.map(chunk => isHexMode ? toHex(chunk) : toAscii(chunk)).join('');
-    }, [group.data, isHexMode]);
-
-    const shouldCollapse = fullText.length > 200;
-    const displayText = shouldCollapse && !isExpanded ? fullText.slice(0, 200) + '...' : fullText;
-
-    return (
-        <div className="flex gap-2 hover:bg-gray-800 p-1 rounded group">
-            <span className="text-gray-500 shrink-0 select-none">
-                [{formatTimestamp(group.timestamp)}]
-            </span>
-            <span className={`shrink-0 ${group.direction === 'TX' ? 'text-blue-400' : 'text-green-400'} select-none`}>
-                {group.direction === 'TX' ? <ArrowUp className="w-3 h-3 inline" /> : <ArrowDown className="w-3 h-3 inline" />}
-            </span>
-            <div className="flex-1 min-w-0">
-                <span className="break-all text-gray-300 whitespace-pre-wrap">
-                    {displayText}
-                </span>
-                {shouldCollapse && (
-                    <button
-                        onClick={() => setIsExpanded(!isExpanded)}
-                        className="ml-2 text-xs text-blue-400 hover:text-blue-300 hover:underline select-none"
-                    >
-                        {isExpanded ? 'Show less' : 'Show more'}
-                    </button>
-                )}
+                        return (
+                            <div className="flex gap-2 hover:bg-gray-800 p-1 rounded group items-start mb-1">
+                                <span className="text-gray-500 shrink-0 select-none text-[10px] w-14 pt-0.5">
+                                    {formatTimestamp(group.timestamp)}
+                                </span>
+                                <span className={`shrink-0 ${group.direction === 'TX' ? 'text-blue-400' : 'text-green-400'} select-none pt-0.5`}>
+                                    {group.direction === 'TX' ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />}
+                                </span>
+                                <div className="flex-1 min-w-0 break-all whitespace-pre-wrap text-gray-300 text-xs font-mono">
+                                    {displayText}
+                                </div>
+                            </div>
+                        );
+                    }}
+                    className="scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent"
+                />
             </div>
         </div>
     );

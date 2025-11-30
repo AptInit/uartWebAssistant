@@ -27,6 +27,7 @@ interface SerialContextType {
 
 const SerialContext = createContext<SerialContextType | null>(null);
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useSerialContext = () => {
     const context = useContext(SerialContext);
     if (!context) {
@@ -46,15 +47,19 @@ export const SerialProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }, []);
 
     const addLog = useCallback((direction: 'TX' | 'RX', data: Uint8Array) => {
-        setLogs(prev => [
-            ...prev,
-            {
+        setLogs(prev => {
+            const newLog: LogEntry = {
                 id: crypto.randomUUID(),
                 timestamp: new Date(),
                 direction,
                 data,
-            },
-        ]);
+            };
+            const newLogs = [...prev, newLog];
+            if (newLogs.length > 1000) {
+                return newLogs.slice(newLogs.length - 1000);
+            }
+            return newLogs;
+        });
     }, []);
 
     const sendData = useCallback(async (data: string | Uint8Array) => {

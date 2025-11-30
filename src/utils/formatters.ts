@@ -5,6 +5,7 @@ export const toHex = (data: Uint8Array): string => {
 };
 
 export const toAscii = (data: Uint8Array): string => {
+    // eslint-disable-next-line no-control-regex
     return new TextDecoder().decode(data).replace(/[\x00-\x09\x0B\x0C\x0E-\x1F\x7F]/g, '.'); // Replace non-printable with dot, excluding \n and \r
 };
 

@@ -1,73 +1,75 @@
-# React + TypeScript + Vite
+# UART Web Assistant
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern, web-based serial port terminal for embedded development, built with React, TypeScript, and Vite.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Web Serial API Integration**: Connect to serial devices directly from your browser.
+- **Real-time Communication**: Send and receive data in real-time.
+- **Multiple Modes**: Support for both ASCII/Text and Hexadecimal data visualization.
+- **XMODEM Support**: Upload and download files using the XMODEM protocol.
+- **Log Management**: View, filter, and export communication logs.
+- **Modern UI**: Clean and responsive interface with dark mode support.
 
-## React Compiler
+## Getting Started
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Prerequisites
 
-## Expanding the ESLint configuration
+- Node.js (v18 or later recommended)
+- A modern browser with Web Serial API support (Chrome, Edge, Opera).
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Installation
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/AptInit/uartWebAssistant.git
+   cd uartWebAssistant
+   ```
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Running Locally
+
+Start the development server:
+
+```bash
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Open your browser and navigate to `http://localhost:5173`.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Usage Guide
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Connecting to a Device
+
+1. Click the **Connect** button in the top left corner.
+2. Select your serial device from the browser prompt.
+3. Configure the baud rate (default is 115200) and other settings if necessary.
+
+### Sending and Receiving Data
+
+- **Input Area**: Type your message in the input field at the bottom and press Enter or click Send.
+- **Hex Mode**: Toggle "Hex Mode" to send and view data in hexadecimal format.
+- **Line Endings**: Choose between LF, CR, or CRLF line endings.
+
+### XMODEM File Transfer
+
+- **Upload**: Click the "Upload" button to send a file to the connected device using XMODEM.
+- **Download**: Click the "Download" button to receive a file from the device.
+
+## Building for Production
+
+To create a production build:
+
+```bash
+npm run build
 ```
+
+The output will be in the `dist` directory.
+
+## License
+
+This project is licensed under the BSD 2-Clause License.

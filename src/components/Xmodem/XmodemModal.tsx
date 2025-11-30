@@ -75,8 +75,9 @@ export const XmodemModal: React.FC<XmodemModalProps> = ({ isOpen, onClose }) => 
             } else {
                 setStatus('No response to Cancel sequence.');
             }
-        } catch (error: any) {
-            setStatus(`Error: ${error.message}`);
+        } catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            setStatus(`Error: ${errorMessage}`);
         } finally {
             setIsTransferring(false);
             setDataHandler(null);
@@ -121,7 +122,7 @@ export const XmodemModal: React.FC<XmodemModalProps> = ({ isOpen, onClose }) => 
                 } else {
                     throw new Error(`Unexpected initial byte: 0x${initialByte.toString(16)}`);
                 }
-            } catch (e) {
+            } catch {
                 throw new Error('Handshake timed out. Ensure receiver is ready.');
             }
 
@@ -167,7 +168,7 @@ export const XmodemModal: React.FC<XmodemModalProps> = ({ isOpen, onClose }) => 
                         } else {
                             // Ignore garbage?
                         }
-                    } catch (e) {
+                    } catch {
                         setStatus(`Timeout. Retrying block ${blockNumber}...`);
                         retries++;
                         // Enable rate limiting on failure
@@ -192,13 +193,14 @@ export const XmodemModal: React.FC<XmodemModalProps> = ({ isOpen, onClose }) => 
                     // Try sending EOT again?
                     await sendData(new Uint8Array([EOT]));
                 }
-            } catch (e) {
+            } catch {
                 // Ignore EOT timeout
             }
 
             setStatus('Transfer Complete!');
-        } catch (error: any) {
-            setStatus(`Error: ${error.message}`);
+        } catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            setStatus(`Error: ${errorMessage}`);
             console.error(error);
         } finally {
             setIsTransferring(false);
@@ -217,7 +219,7 @@ export const XmodemModal: React.FC<XmodemModalProps> = ({ isOpen, onClose }) => 
         let expectedBlock = 1;
         let retries = 0;
         const MAX_RETRIES = 10;
-        let useCRC = true; // Try CRC first
+        const useCRC = true; // Try CRC first
 
         // Take over data stream
         setDataHandler((data) => {
@@ -328,9 +330,7 @@ export const XmodemModal: React.FC<XmodemModalProps> = ({ isOpen, onClose }) => 
             // Try to use File System Access API
             let saved = false;
             try {
-                // @ts-ignore
                 if (window.showSaveFilePicker) {
-                    // @ts-ignore
                     const handle = await window.showSaveFilePicker({
                         suggestedName: 'received_file.bin',
                         types: [{
@@ -343,8 +343,8 @@ export const XmodemModal: React.FC<XmodemModalProps> = ({ isOpen, onClose }) => 
                     await writable.close();
                     saved = true;
                 }
-            } catch (err: any) {
-                if (err.name === 'AbortError') {
+            } catch (err: unknown) {
+                if (err instanceof Error && err.name === 'AbortError') {
                     setStatus('Download cancelled');
                     return;
                 }
@@ -366,8 +366,9 @@ export const XmodemModal: React.FC<XmodemModalProps> = ({ isOpen, onClose }) => 
             }
 
             setStatus('Download Complete!');
-        } catch (error: any) {
-            setStatus(`Error: ${error.message}`);
+        } catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            setStatus(`Error: ${errorMessage}`);
         } finally {
             setIsTransferring(false);
             setDataHandler(null);

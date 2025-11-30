@@ -1,7 +1,14 @@
 {
   "name": "uart-web-assistant",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
+  "description": "A web-based serial port terminal for embedded development, 100% vibe coding.",
+  "author": "AptInit",
+  "license": "BSD-2-Clause",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AptInit/uartWebAssistant.git"
+  },
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -14,6 +21,7 @@
     "lucide-react": "^0.555.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
+    "react-virtuoso": "^4.15.0",
     "tailwind-merge": "^3.4.0"
   },
   "devDependencies": {
