@@ -23,6 +23,8 @@ interface SerialContextType {
         delayMs: number;
     };
     setRateLimitConfig: (config: { enabled: boolean; chunkSize: number; delayMs: number }) => void;
+    isHexMode: boolean;
+    setIsHexMode: (enabled: boolean) => void;
 }
 
 const SerialContext = createContext<SerialContextType | null>(null);
@@ -39,6 +41,7 @@ export const useSerialContext = () => {
 export const SerialProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const { isConnected, connect, disconnect, getReader, write } = useSerial();
     const [logs, setLogs] = useState<LogEntry[]>([]);
+    const [isHexMode, setIsHexMode] = useState(false);
     const readerRef = useRef<ReadableStreamDefaultReader<Uint8Array> | null>(null);
     const dataHandlerRef = useRef<((data: Uint8Array) => void) | null>(null);
 
@@ -134,6 +137,8 @@ export const SerialProvider: React.FC<{ children: React.ReactNode }> = ({ childr
                 setDataHandler,
                 rateLimitConfig,
                 setRateLimitConfig,
+                isHexMode,
+                setIsHexMode,
             }}
         >
             {children}

@@ -51,9 +51,10 @@ Open your browser and navigate to `http://localhost:5173`.
 
 ### Sending and Receiving Data
 
+- **Control Panel**: Located in the top right, this panel contains:
+  - **Hex Mode**: Toggle between ASCII/Text and Hexadecimal display modes.
+  - **Rate Limit**: Configure data sending rate limits (Delay and Chunk size) to prevent buffer overflows on slower devices.
 - **Input Area**: Type your message in the input field at the bottom and press Enter or click Send.
-- **Hex Mode**: Toggle "Hex Mode" to send and view data in hexadecimal format.
-- **Line Endings**: Choose between LF, CR, or CRLF line endings.
 
 ### XMODEM File Transfer
 

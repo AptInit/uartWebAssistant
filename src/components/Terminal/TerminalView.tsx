@@ -1,9 +1,9 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { useSerialContext } from '../../context/SerialContext';
 import { toHex, toAscii } from '../../utils/formatters';
 
 export const TerminalView: React.FC = () => {
-    const { logs } = useSerialContext(); // In a real terminal, we might want a separate stream buffer, but using logs for now is easier to sync.
+    const { logs, isHexMode } = useSerialContext(); // In a real terminal, we might want a separate stream buffer, but using logs for now is easier to sync.
     // Actually, for a raw terminal, we usually want a continuous stream. 
     // But since we are building a "web assistant", maybe a list of packets is better?
     // The user asked for "Terminal for embedded development".
@@ -12,7 +12,6 @@ export const TerminalView: React.FC = () => {
     // However, using `logs` is safer for React state. 
     // Let's render the logs in a "Terminal" style (continuous text).
 
-    const [isHexMode, setIsHexMode] = useState(false);
     const endRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -58,19 +57,6 @@ export const TerminalView: React.FC = () => {
                     </span>
                 ))}
                 <div ref={endRef} />
-            </div>
-
-            {/* Floating controls for the terminal view */}
-            <div className="fixed bottom-20 right-96 mr-4 bg-gray-800 p-2 rounded shadow-lg opacity-80 hover:opacity-100 transition-opacity">
-                <label className="flex items-center gap-2 text-white text-xs cursor-pointer">
-                    <input
-                        type="checkbox"
-                        checked={isHexMode}
-                        onChange={(e) => setIsHexMode(e.target.checked)}
-                        className="rounded bg-gray-700 border-gray-600"
-                    />
-                    Hex Mode
-                </label>
             </div>
         </div>
     );

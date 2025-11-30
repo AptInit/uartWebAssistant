@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Plug, PlugZap, RefreshCw } from 'lucide-react';
 import type { SerialOptions } from '../../hooks/useSerial';
 
+
 interface ConnectionPanelProps {
     isConnected: boolean;
     onConnect: (options: SerialOptions) => Promise<void>;
@@ -19,6 +20,7 @@ export const ConnectionPanel: React.FC<ConnectionPanelProps> = ({
 }) => {
     const [baudRate, setBaudRate] = useState(115200);
     const [isConnecting, setIsConnecting] = useState(false);
+
 
     const handleConnect = async () => {
         setIsConnecting(true);

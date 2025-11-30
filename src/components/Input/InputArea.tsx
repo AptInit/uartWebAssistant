@@ -5,11 +5,17 @@ import { useSerialContext } from '../../context/SerialContext';
 import { sendWithRateLimit } from '../../utils/rateLimiter';
 
 export const InputArea: React.FC = () => {
-    const { isConnected, sendData, rateLimitConfig, setRateLimitConfig } = useSerialContext();
+    const { isConnected, sendData, rateLimitConfig, isHexMode } = useSerialContext();
     const [input, setInput] = useState('');
-    const [isHexMode, setIsHexMode] = useState(false);
     const [isSending, setIsSending] = useState(false);
     const [progress, setProgress] = useState(0);
+    const inputRef = React.useRef<HTMLTextAreaElement>(null);
+
+    React.useEffect(() => {
+        if (!isSending && isConnected) {
+            inputRef.current?.focus();
+        }
+    }, [isSending, isConnected]);
 
     const handleSend = async () => {
         if (!input || !isConnected || isSending) return;
@@ -85,65 +91,19 @@ export const InputArea: React.FC = () => {
 
     return (
         <div className="flex flex-col gap-2 bg-gray-800 p-2">
-            {/* Settings Bar */}
-            <div className="flex items-center gap-4 text-xs text-gray-400">
-                <label className="flex items-center gap-1 cursor-pointer">
-                    <input
-                        type="checkbox"
-                        checked={isHexMode}
-                        onChange={(e) => setIsHexMode(e.target.checked)}
-                        className="rounded bg-gray-700 border-gray-600"
-                    />
-                    Hex Input
-                </label>
-
-                <div className="h-4 w-px bg-gray-600" />
-
-                <label className="flex items-center gap-1 cursor-pointer">
-                    <input
-                        type="checkbox"
-                        checked={rateLimitConfig.enabled}
-                        onChange={(e) => setRateLimitConfig({ ...rateLimitConfig, enabled: e.target.checked })}
-                        className="rounded bg-gray-700 border-gray-600"
-                    />
-                    Rate Limit
-                </label>
-
-                {rateLimitConfig.enabled && (
-                    <>
-                        <div className="flex items-center gap-1">
-                            <span>Delay</span>
-                            <input
-                                type="number"
-                                value={rateLimitConfig.delayMs}
-                                onChange={(e) => setRateLimitConfig({ ...rateLimitConfig, delayMs: Number(e.target.value) })}
-                                className="w-12 bg-gray-700 border border-gray-600 rounded px-1"
-                            />
-                            <span>ms</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                            <span>Every</span>
-                            <input
-                                type="number"
-                                value={rateLimitConfig.chunkSize}
-                                onChange={(e) => setRateLimitConfig({ ...rateLimitConfig, chunkSize: Number(e.target.value) })}
-                                className="w-12 bg-gray-700 border border-gray-600 rounded px-1"
-                            />
-                            <span>bytes</span>
-                        </div>
-                    </>
-                )}
-            </div>
+            {/* Settings Bar Removed - Moved to ControlPanel */}
 
             {/* Input Bar */}
             <div className="flex gap-2">
                 <textarea
+                    ref={inputRef}
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={handleKeyDown}
-                    placeholder={isHexMode ? "Enter Hex (e.g. AA BB CC)" : "Enter text..."}
+                    placeholder={isHexMode ? "Enter Hex (e.g. AA BB CC)" : "Type text, press Enter to send, or use Shift+Enter for a new line."}
                     className="flex-1 bg-gray-900 text-white border border-gray-700 rounded p-2 font-mono text-sm resize-none h-10 focus:h-24 transition-all focus:ring-1 focus:ring-blue-500 outline-none"
-                    disabled={!isConnected || isSending}
+                    disabled={!isConnected}
+                    readOnly={isSending}
                 />
                 <button
                     onClick={handleSend}

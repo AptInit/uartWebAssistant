@@ -7,6 +7,8 @@ import { TerminalView } from './components/Terminal/TerminalView';
 import { InputArea } from './components/Input/InputArea';
 import { XmodemModal } from './components/Xmodem/XmodemModal';
 
+import { ControlPanel } from './components/ControlPanel/ControlPanel';
+
 const AppContent = () => {
   const { isConnected, connect, disconnect } = useSerialContext();
 
@@ -24,7 +26,12 @@ const AppContent = () => {
           />
         }
         main={<TerminalView />}
-        rightPanel={<CommunicationLog />}
+        rightPanel={
+          <>
+            <ControlPanel />
+            <CommunicationLog />
+          </>
+        }
         footer={<InputArea />}
       />
       <XmodemModal isOpen={isXmodemOpen} onClose={() => setIsXmodemOpen(false)} />

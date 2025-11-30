@@ -1,12 +1,11 @@
-import React, { useState, useRef } from 'react';
-import { ArrowDown, ArrowUp, Trash2, FileText, Binary } from 'lucide-react';
+import React, { useRef } from 'react';
+import { ArrowDown, ArrowUp, Trash2 } from 'lucide-react';
 import { Virtuoso, type VirtuosoHandle } from 'react-virtuoso';
 import { useSerialContext } from '../../context/SerialContext';
 import { toHex, toAscii, formatTimestamp } from '../../utils/formatters';
 
 export const CommunicationLog: React.FC = () => {
-    const { logs, clearLogs } = useSerialContext();
-    const [isHexMode, setIsHexMode] = useState(true);
+    const { logs, clearLogs, isHexMode } = useSerialContext();
     const virtuosoRef = useRef<VirtuosoHandle>(null);
 
     const groupedLogs = React.useMemo(() => {
@@ -43,13 +42,6 @@ export const CommunicationLog: React.FC = () => {
             <div className="flex items-center justify-between p-2 bg-gray-800 border-b border-gray-700">
                 <h3 className="text-sm font-semibold text-gray-300">Communication Log</h3>
                 <div className="flex gap-2">
-                    <button
-                        onClick={() => setIsHexMode(!isHexMode)}
-                        className="p-1 hover:bg-gray-700 rounded text-gray-400 hover:text-white"
-                        title={isHexMode ? "Switch to Text" : "Switch to Hex"}
-                    >
-                        {isHexMode ? <Binary className="w-4 h-4" /> : <FileText className="w-4 h-4" />}
-                    </button>
                     <button
                         onClick={clearLogs}
                         className="p-1 hover:bg-gray-700 rounded text-gray-400 hover:text-red-400"
